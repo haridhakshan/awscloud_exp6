@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function TodoApp() {
+export default function App() {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
+  const API_URL = "http://localhost:8080";
 
   useEffect(() => {
     fetchTodos();
@@ -11,7 +12,7 @@ export default function TodoApp() {
 
   const fetchTodos = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/todos/all");
+      const response = await axios.get(`${API_URL}/api/todos/all`);
       setTodos(response.data);
     } catch (error) {
       console.error("Error fetching todos:", error);
@@ -21,8 +22,8 @@ export default function TodoApp() {
   const addTodo = async () => {
     if (!newTodo.trim()) return;
     try {
-      const response = await axios.get(`http://localhost:8080/api/todos/create?title=${newTodo}`);
-      setTodos([...todos, response.data]);
+      const response = await axios.get(`${API_URL}/api/todos/create?title=${newTodo}`);
+      setTodos((prevTodos) => [...prevTodos, response.data]);
       setNewTodo("");
     } catch (error) {
       console.error("Error adding todo:", error);
@@ -31,8 +32,8 @@ export default function TodoApp() {
 
   const deleteTodo = async (id) => {
     try {
-      await axios.get(`http://localhost:8080/api/todos/delete?id=${id}`);
-      setTodos(todos.filter(todo => todo.id !== id));
+      await axios.get(`${API_URL}/api/todos/delete?id=${id}`);
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
     } catch (error) {
       console.error("Error deleting todo:", error);
     }
@@ -42,16 +43,16 @@ export default function TodoApp() {
     <div className="container">
       <h1>Todo List</h1>
       <div className="input-container">
-        <input 
-          type="text" 
-          value={newTodo} 
-          onChange={(e) => setNewTodo(e.target.value)} 
-          placeholder="Enter a new todo" 
+        <input
+          type="text"
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+          placeholder="Enter a new todo"
         />
         <button onClick={addTodo}>Add</button>
       </div>
       <ul>
-        {todos.map(todo => (
+        {todos.map((todo) => (
           <li key={todo.id}>
             {todo.title}
             <button onClick={() => deleteTodo(todo.id)}>Delete</button>
@@ -59,12 +60,29 @@ export default function TodoApp() {
         ))}
       </ul>
       <style jsx>{`
-        .container { text-align: center; padding: 20px; }
-        .input-container { margin-bottom: 10px; }
-        input { padding: 5px; margin-right: 10px; }
-        button { padding: 5px 10px; }
-        ul { list-style: none; padding: 0; }
-        li { margin: 5px 0; display: flex; justify-content: space-between; }
+        .container {
+          text-align: center;
+          padding: 20px;
+        }
+        .input-container {
+          margin-bottom: 10px;
+        }
+        input {
+          padding: 5px;
+          margin-right: 10px;
+        }
+        button {
+          padding: 5px 10px;
+        }
+        ul {
+          list-style: none;
+          padding: 0;
+        }
+        li {
+          margin: 5px 0;
+          display: flex;
+          justify-content: space-between;
+        }
       `}</style>
     </div>
   );

@@ -1,0 +1,49 @@
+version: '3.8'
+
+networks:
+  mynetwork:
+    driver: bridge
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: todo
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    networks:
+      - mynetwork
+
+  backend:
+    build: ./backend
+    container_name: spring_boot_app
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      SPRING_APPLICATION_NAME: demo
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/todo
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    ports:
+      - "8080:8080"
+    networks:
+      - mynetwork
+
+  frontend:
+    build: ./frontend
+    container_name: vite_react_app
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://spring_boot_app:8080
+    ports:
+      - "3000:5173"  # Exposes React app on EC2 port 3000
+    networks:
+      - mynetwork
