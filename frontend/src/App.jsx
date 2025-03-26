@@ -4,7 +4,7 @@ import axios from "axios";
 export default function App() {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
-  const API_URL = "http://localhost:8080";
+  const API_URL = window.location.origin + ":8080";
 
   useEffect(() => {
     fetchTodos();
@@ -22,9 +22,9 @@ export default function App() {
   const addTodo = async () => {
     if (!newTodo.trim()) return;
     try {
-      const response = await axios.get(`${API_URL}/api/todos/create?title=${newTodo}`);
-      setTodos((prevTodos) => [...prevTodos, response.data]);
+      await axios.get(`${API_URL}/api/todos/create?title=${newTodo}`);
       setNewTodo("");
+      fetchTodos(); // Fetch updated list
     } catch (error) {
       console.error("Error adding todo:", error);
     }
@@ -33,7 +33,7 @@ export default function App() {
   const deleteTodo = async (id) => {
     try {
       await axios.get(`${API_URL}/api/todos/delete?id=${id}`);
-      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+      fetchTodos(); // Fetch updated list
     } catch (error) {
       console.error("Error deleting todo:", error);
     }
