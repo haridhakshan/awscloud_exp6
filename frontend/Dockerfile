@@ -1,18 +1,12 @@
-# Use Node.js image
-FROM node:18-alpine
-
-# Set working directory
+# Build Stage
+FROM node:18 as builder
 WORKDIR /app
-
-# Copy package.json and install dependencies
-COPY package.json package-lock.json ./
-RUN npm install
-
-# Copy the rest of the frontend files
 COPY . .
+RUN npm install
+RUN npm run build
 
-# Expose Vite's default port (5173)
-EXPOSE 5173
-
-# Run Vite in dev mode
-CMD ["npm", "run", "dev", "--", "--host"]
+# Serve with Nginx
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
