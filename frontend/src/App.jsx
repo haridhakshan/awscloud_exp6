@@ -4,7 +4,7 @@ import axios from "axios";
 export default function App() {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
-  const API_URL = window.location.origin + ":8080";
+  const API_URL = window.location.origin.replace(":3000", ":8080");
 
   useEffect(() => {
     fetchTodos();
